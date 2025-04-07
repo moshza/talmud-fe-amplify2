@@ -9,11 +9,12 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
-import { Hub } from 'aws-amplify';
+import { Hub } from 'aws-amplify/utils';
 import { connect } from 'react-redux';
 import { getUserAuth, setUserAuth, signOut } from '../../store/actions/authActions';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { fetchAuthSession, getCurrentUser } from '@aws-amplify/auth';
 
 const mapStateToProps = (state: any) => ({
   username: state.authentication.username,
@@ -44,8 +45,15 @@ const AccountMenu = (props: Props) => {
 
   Hub.listen('auth', (data) => {
     const { payload } = data;
-    if (payload.event === 'signIn') {
-      setUserAuth(payload.data.signInUserSession);
+    if (payload.event === 'signedIn') { 
+      getCurrentUser().then(currentUser => {
+        fetchAuthSession().then(session => {
+          setUserAuth({
+            ...currentUser,
+            signInUserSession: session
+          });
+        });
+      });
     }
   });
 

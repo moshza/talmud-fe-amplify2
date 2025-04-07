@@ -21,6 +21,8 @@ export default (async () => {
           ".ts": "tsx",
         },
       },
+      include: ['@aws-amplify/auth'],
+
     },
     server: {
       port: 3001,
